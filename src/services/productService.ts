@@ -13,10 +13,14 @@ export const getProducts = async (pageParam: string, limitParam: string) => {
   }
 
   const skip = (page - 1) * limit
-  const payload: IProduct[] = await Product.find()
+  // {price: {$eq: 30}}
+  // {$and: [{ price: { $gt: 20 } }, { quantity: { $eq: 5 } }],}
+  // {price: {$gt: 20}}
+  const payload = await Product.find()
     .populate('category')
     .skip(skip)
     .limit(limit)
+    // .sort({ price: 1})
   return {
     payload,
     page,
@@ -25,7 +29,7 @@ export const getProducts = async (pageParam: string, limitParam: string) => {
   }
 }
 export const getSingleProduct = async (slug: string): Promise<IProduct> => {
-  const product= await Product.findOne({ slug: slug })
+  const product = await Product.findOne({ slug: slug })
   if (!product) {
     throw createHttpError(404, 'Product not found!')
   }
@@ -55,7 +59,7 @@ export const createProduct = async (
 
   const productExist = await Product.exists({ title: title })
   if (productExist) {
-    throw  createHttpError(404, 'Product already exists')
+    throw createHttpError(404, 'Product already exists')
   }
 
   const newProduct: IProduct = new Product({

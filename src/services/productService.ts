@@ -1,3 +1,4 @@
+import { deleteImage } from '../helper/deleteImageHelper'
 import { Product } from '../models/productSchema'
 import { IProduct, ProductInput, ProductType } from '../types/types'
 import { createHttpError } from '../util/createHttpError'
@@ -50,12 +51,19 @@ export const getSingleProduct = async (slug: string): Promise<IProduct> => {
 }
 
 export const deleteProduct = async (slug: string) => {
-  const deletedProduct = await Product.findOneAndDelete({ slug: slug })
+  const deletedProduct = await Product.findOneAndDelete({
+    slug: slug,
+  })
   if (!deletedProduct) {
     throw new Error('Product not found!')
   }
+  if (deletedProduct && deletedProduct.image) {
+    deleteImage(deletedProduct.image)
+  }
+  
   return deletedProduct
 }
+// TODO: image!
 export const createProduct = async (
   productInput: ProductInput,
 ): Promise<IProduct> => {

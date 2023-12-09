@@ -70,4 +70,6 @@ export type UserType = {
   password: string
   address: string
   phone: string
+  isAdmin?: boolean,
+  isBanned?:boolean
 }

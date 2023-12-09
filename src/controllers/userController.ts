@@ -5,8 +5,17 @@ import bcrypt from 'bcrypt'
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { dev } from '../config'
 import { handleSendEmail } from '../helper/sendEmail'
-import { banUserById, findUser, getUsers, unbanUserById } from '../services/userService'
+import {
+  banUserById,
+  deleteUserById,
+  findUser,
+  getUsers,
+  unbanUserById,
+} from '../services/userService'
 import { UserType } from '../types/types'
+import mongoose from 'mongoose'
+import { deleteImage } from '../helper/deleteImageHelper'
+
 
 export const getAllUsers = async (
   req: Request,
@@ -148,7 +157,7 @@ export const banUser = async (
   try {
     await banUserById(req.params.id)
     res.status(200).json({
-      message: 'User successfully banned'
+      message: 'User successfully banned',
     })
   } catch (error) {
     next(error)
@@ -166,5 +175,29 @@ export const unbanUser = async (
     })
   } catch (error) {
     next(error)
+  }
+}
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = await deleteUserById(req.params.id)
+    if (user && user.image) {
+      deleteImage(user.image)
+    }
+    res.status(204).json({
+      message: 'deleted succuss',
+    })
+  } catch (error) {
+    //! no working when enter not valid id
+    if (error instanceof mongoose.Error.CastError) {
+      const formatError = createHttpError(400, 'Id format is not valid')
+      next(formatError)
+    } else {
+      console.error(error)
+      next(createHttpError(500, 'Internal Server Error'))
+    }
   }
 }

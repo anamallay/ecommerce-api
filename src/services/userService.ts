@@ -80,3 +80,10 @@ export const unbanUserById = async (id: string) => {
     throw createHttpError(500, 'Error retrieving user')
   }
 }
+export const deleteUserById = async (id: string) => {
+  const user = await User.findByIdAndDelete(id)
+  if (!user) {
+    throw new Error('User not found')
+  }
+  return user
+}

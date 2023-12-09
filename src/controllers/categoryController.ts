@@ -6,7 +6,8 @@ import {
   getCategories,
   updateCategoryById,
 } from '../services/categoryService'
-
+import mongoose from 'mongoose'
+import { createHttpError } from '../util/createHttpError'
 
 export const getAllCategories = async (
   req: Request,
@@ -20,7 +21,13 @@ export const getAllCategories = async (
       payload: categories,
     })
   } catch (error) {
-    next(error)
+    //TODO: add this to all controllers
+    if (error instanceof mongoose.Error.CastError) {
+      const error = createHttpError(400, 'Id format is not valid')
+      next(error)
+    } else {
+      next(error)
+    }
   }
 }
 export const getSingleCategoryById = async (
@@ -31,7 +38,7 @@ export const getSingleCategoryById = async (
   try {
     const { id } = req.params
     const category = await findCategoryById(id)
-    console.log('Received ID:', id) // Log the ID for debugging
+    console.log('Received ID:', id)
     if (!category) {
       return res.status(404).json({ message: 'Category not found' })
     }
@@ -49,7 +56,7 @@ export const deleteSingleCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params // Changed from slug to id
+    const { id } = req.params
     const deletedCategory = await deleteCategoryById(id)
 
     if (!deletedCategory) {

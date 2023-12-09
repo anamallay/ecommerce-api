@@ -7,7 +7,7 @@ import {
   updateProduct,
 } from '../services/productService'
 import slugify from 'slugify'
-
+import { deleteImage } from '../helper/deleteImageHelper'
 
 export const getAllProducts = async (
   req: Request,

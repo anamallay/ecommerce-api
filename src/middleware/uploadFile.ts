@@ -9,4 +9,14 @@ const productStorge = multer.diskStorage({
   },
 })
 
-export const upload = multer({ storage: productStorge })
+const userStorge = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images/users')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
+  },
+})
+
+export const uploadProduct = multer({ storage: productStorge })
+export const uploadUser = multer({ storage: userStorge })

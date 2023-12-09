@@ -2,11 +2,24 @@ import { Product } from '../models/productSchema'
 import { IProduct, ProductInput, ProductType } from '../types/types'
 import { createHttpError } from '../util/createHttpError'
 import slugify from 'slugify'
-export const getProducts = async (pageParam: string, limitParam: string) => {
+export const getProducts = async (
+  pageParam: string,
+  limitParam: string,
+  search: string,
+) => {
   let page = Number(pageParam) || 1
   const limit = Number(limitParam) || 10
   const totalCount = await Product.countDocuments()
   const totalPages = Math.ceil(totalCount / limit)
+
+  // const query = search ? { name: { $regex: search, $options: 'i' } } : {}
+  const searchRegExp = new RegExp('.*' + search + '.*', 'i')
+  const filter = {
+    $or: [
+      { title: { $regex: searchRegExp } },
+      { description: { $regex: searchRegExp } }, //*Corrected from $regax to $regex
+    ],
+  }
 
   if (page > totalPages) {
     page = totalPages > 0 ? totalPages : 1
@@ -16,11 +29,11 @@ export const getProducts = async (pageParam: string, limitParam: string) => {
   // {price: {$eq: 30}}
   // {$and: [{ price: { $gt: 20 } }, { quantity: { $eq: 5 } }],}
   // {price: {$gt: 20}}
-  const payload = await Product.find()
+  const payload = await Product.find(filter)
     .populate('category')
     .skip(skip)
     .limit(limit)
-    // .sort({ price: 1})
+  // .sort({ price: 1})
   return {
     payload,
     page,
@@ -54,7 +67,7 @@ export const createProduct = async (
     quantity,
     sold,
     shipping,
-    image,
+    image = undefined,
   } = productInput
 
   const productExist = await Product.exists({ title: title })
@@ -66,7 +79,7 @@ export const createProduct = async (
     title: title,
     slug: slugify(title),
     price: price,
-    image: image,
+    ...(image && { image: image }),
     description: description,
     quantity: quantity,
     category: category,

@@ -6,10 +6,8 @@ import {
   getSingleProduct,
   updateProduct,
 } from '../services/productService'
-import { Product } from '../models/productSchema'
 import slugify from 'slugify'
-import { createHttpError } from '../util/createHttpError'
-import { IProduct } from '../types/types'
+
 
 export const getAllProducts = async (
   req: Request,
@@ -19,12 +17,11 @@ export const getAllProducts = async (
   try {
     const page = typeof req.query.page === 'string' ? req.query.page : '1'
     const limit = typeof req.query.limit === 'string' ? req.query.limit : '10'
+    const search = req.query.search === 'string' ? req.query.search : ''
 
-    const result = await getProducts(page, limit)
-    // TDO: add this: romve payload
+    const result = await getProducts(page, limit, search)
     res.status(200).json({
       message: 'Returns all products',
-      // payload: result.products,
       ...result,
     })
   } catch (error) {

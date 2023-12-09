@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose'
 import { IProduct } from '../types/types'
+import { dev } from '../config'
 const productSchema = new Schema<IProduct>(
   {
     slug: {
@@ -18,7 +19,7 @@ const productSchema = new Schema<IProduct>(
     },
     image: {
       type: String,
-      default: 'publice/images/products/default.png'
+      default: dev.app.defaultImagePath,
     },
     description: {
       type: String,
@@ -49,7 +50,6 @@ const productSchema = new Schema<IProduct>(
     },
     sold: {
       type: Number,
-      // required: [true, 'Sold count is required'],
       default: 0,
       min: [0, 'Sold count cannot be negative'],
       validate: {
@@ -65,7 +65,6 @@ const productSchema = new Schema<IProduct>(
       {
         type: Schema.Types.ObjectId,
         ref: 'Categories',
-        // required: true,
       },
     ],
   },

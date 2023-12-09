@@ -20,15 +20,6 @@ export type ProductType = {
 
 export type ProductInput = Omit<ProductType, '_id'>
 // ============
-export interface ICategory extends Document {
-  _id: string
-  title: string
-  slug: string
-  createdAt?: string
-  updatedAt?: string
-  __v: number
-}
-
 export interface IProduct extends Document {
   title: string
   slug: string
@@ -42,4 +33,41 @@ export interface IProduct extends Document {
   createAt?: string
   updatedAt?: string
   __v: number
+}
+export interface ICategory extends Document {
+  _id: string
+  title: string
+  slug: string
+  createdAt?: string
+  updatedAt?: string
+  __v: number
+}
+
+export interface IUser extends Document {
+  name: string
+  email: string
+  password: string
+  image?: string
+  address: string
+  phone: string
+  // order: string
+  isAdmin?: boolean
+  isBanned?: boolean
+  createdAt?: string
+  updatedAt?: string
+  __v: number
+}
+export type EmailDataType = {
+  email: string
+  subject: string
+  html: string
+}
+
+export type UserType = {
+  name: string
+  image?: string,
+  email: string
+  password: string
+  address: string
+  phone: string
 }

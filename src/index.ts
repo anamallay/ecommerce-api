@@ -24,6 +24,8 @@ app.listen(port, () => {
 app.use('/api/products', productRouter)
 app.use('/api/categories', categoryRouter)
 app.use('/api/users', userRouter)
+// app.use('/api/auth', order?)
+
 
 app.use((res, req, next) => {
   const error = createHttpError(404, "Router no found")

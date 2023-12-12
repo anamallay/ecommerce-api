@@ -3,7 +3,7 @@ import {
   createSingleCategory,
   deleteSingleCategory,
   getAllCategories,
-  getSingleCategoryById, // Updated function name
+  getSingleCategoryById, 
   updateSingleCategory,
 } from '../controllers/categoryController'
 

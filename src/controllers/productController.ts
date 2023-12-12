@@ -7,7 +7,9 @@ import {
   updateProduct,
 } from '../services/productService'
 import slugify from 'slugify'
-import { deleteImage } from '../helper/deleteImageHelper'
+import { replaceImageProduct } from '../helper/ImageHelper'
+import { createHttpError } from '../util/createHttpError'
+import { productUpdateType } from '../types/types'
 
 export const getAllProducts = async (
   req: Request,
@@ -90,20 +92,27 @@ export const createSingleProduct = async (
     next(error)
   }
 }
+
 export const updateSingleProduct = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const originalSlug = req.params.slug
-    const updateProductData = req.body
+    const { params, body, file } = req
+    const { slug } = params
+    const data = body
 
-    const updatedProduct = await updateProduct(originalSlug, updateProductData)
+    replaceImageProduct(file, slug, data)
 
-    res.status(201).json({
-      message: 'Product updated successfully',
-      payload: updatedProduct,
+    const product: productUpdateType = data && (await updateProduct(slug, data))
+    if (!product) {
+      createHttpError(404, `Product with slug ${slug} does not exist`)
+    }
+
+    res.status(200).json({
+      message: 'Update product by slug successfully',
+      payload: product,
     })
   } catch (error) {
     next(error)

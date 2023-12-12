@@ -1,5 +1,5 @@
 import { User } from '../models/userSchema'
-import { IUser } from '../types/types'
+import { IUser, UserType, userUpdateType } from '../types/types'
 import { createHttpError } from '../util/createHttpError'
 
 export const getUsers = async (
@@ -87,3 +87,4 @@ export const deleteUserById = async (id: string) => {
   }
   return user
 }
+//! Error

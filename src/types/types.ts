@@ -3,22 +3,22 @@ export interface Error {
   status?: number
   message?: string
 }
-export type ProductType = {
-  _id: string
-  title: string
-  slug: string
-  image: string
-  category: object
-  description: string
-  price: number
-  quantity: number
-  sold: number
-  shipping: number
-  createdAt?: NativeDate
-  updatedAt?: NativeDate
-}
+// export type ProductType = {
+//   _id: string
+//   title: string
+//   slug: string
+//   image: string
+//   category: object
+//   description: string
+//   price: number
+//   quantity: number
+//   sold: number
+//   shipping: number
+//   createdAt?: NativeDate
+//   updatedAt?: NativeDate
+// }
 
-export type ProductInput = Omit<ProductType, '_id'>
+
 // ============
 export interface IProduct extends Document {
   title: string
@@ -33,7 +33,23 @@ export interface IProduct extends Document {
   createAt?: string
   updatedAt?: string
   __v: number
+  countInStock: number
 }
+// export type ProductInput = Omit<IProduct, '_id'>
+export type ProductInput = Pick<
+  IProduct,
+  | 'title'
+  | 'slug'
+  | 'price'
+  | 'description'
+  | 'category'
+  | 'quantity'
+  | 'sold'
+  | 'shipping'
+  | 'image'
+>
+
+export type productUpdateType = Partial<ProductInput>
 export interface ICategory extends Document {
   _id: string
   title: string
@@ -57,6 +73,11 @@ export interface IUser extends Document {
   updatedAt?: string
   __v: number
 }
+export type userInputType = Omit<
+  IUser,
+  '_id' | 'slug' | 'createdAt' | 'updatedAt' | '__v'
+  >
+export type userUpdateType = Partial<userInputType>
 export type EmailDataType = {
   email: string
   subject: string

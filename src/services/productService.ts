@@ -1,6 +1,7 @@
-import { deleteImage } from '../helper/deleteImageHelper'
+import { StringExpressionOperator } from 'mongoose'
+import { deleteImage } from '../helper/ImageHelper'
 import { Product } from '../models/productSchema'
-import { IProduct, ProductInput, ProductType } from '../types/types'
+import { IProduct, ProductInput, productUpdateType } from '../types/types'
 import { createHttpError } from '../util/createHttpError'
 import slugify from 'slugify'
 export const getProducts = async (
@@ -42,10 +43,10 @@ export const getProducts = async (
     totalCount,
   }
 }
-export const getSingleProduct = async (slug: string): Promise<IProduct> => {
+export const getSingleProduct = async (slug: string) => {
   const product = await Product.findOne({ slug: slug })
   if (!product) {
-    throw createHttpError(404, 'Product not found!')
+     createHttpError(404, 'Product not found!')
   }
   return product
 }
@@ -60,13 +61,11 @@ export const deleteProduct = async (slug: string) => {
   if (deletedProduct && deletedProduct.image) {
     deleteImage(deletedProduct.image)
   }
-  
+
   return deletedProduct
 }
 // TODO: image!
-export const createProduct = async (
-  productInput: ProductInput,
-): Promise<IProduct> => {
+export const createProduct = async (productInput: ProductInput): Promise<IProduct> => {
   const {
     title,
     price,
@@ -97,27 +96,36 @@ export const createProduct = async (
 
   return newProduct.save()
 }
+
 export const updateProduct = async (
-  originalSlug: any,
-  updateProductData: ProductType,
+  slug: string,
+  product: productUpdateType,
 ) => {
-  const productExists = await Product.findOne({ slug: originalSlug })
-  if (!productExists) {
-    throw createHttpError(404, 'Product not found!')
+  const { title, sold, quantity, countInStock } = product as IProduct
+
+  const isProductExist = await Product.exists({ slug: slug })
+  if (!isProductExist) {
+    createHttpError(404, `Product with slug ${slug} does not exist`)
   }
 
-  if (
-    updateProductData.title &&
-    updateProductData.title !== productExists.title
-  ) {
-    updateProductData.slug = slugify(updateProductData.title, {
-      lower: true,
-    })
+  if (title) {
+    const isTitleExist = await Product.exists({ title: title })
+    if (isTitleExist) {
+      createHttpError(409, `Product with title ${title} already exists`)
+    }
   }
 
   const updatedProduct = await Product.findOneAndUpdate(
-    { slug: originalSlug },
-    updateProductData,
+    { slug: slug },
+    {
+      ...product,
+      slug:
+        title && typeof title === 'string'
+          ? slugify(title, { lower: true })
+          : slug,
+      title,
+      sold: quantity - countInStock > 0 ? quantity - countInStock : sold,
+    },
     { new: true },
   )
 

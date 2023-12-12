@@ -7,6 +7,7 @@ import {
   getSingleUser,
   registerUser,
   unbanUser,
+  updateSingleUser
 } from '../controllers/userController'
 import { uploadUser } from '../middleware/uploadFile'
 
@@ -16,6 +17,7 @@ router.post(`/activate`, activeUser)
 router.get(`/`, getAllUsers)
 router.get(`/:id`, getSingleUser)
 router.delete(`/:id`, deleteUser)
+router.put(`/:id`, uploadUser.single('image'), updateSingleUser)
 router.put(`/ban/:id`, banUser)
 router.put(`/unban/:id`, unbanUser)
 

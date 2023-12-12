@@ -12,10 +12,10 @@ import {
   getUsers,
   unbanUserById,
 } from '../services/userService'
-import { UserType } from '../types/types'
+import { UserType, userUpdateType } from '../types/types'
 import mongoose from 'mongoose'
-import { deleteImage } from '../helper/deleteImageHelper'
-
+import { deleteImage, replaceImageUser } from '../helper/ImageHelper'
+import fs from 'fs'
 
 export const getAllUsers = async (
   req: Request,
@@ -199,5 +199,37 @@ export const deleteUser = async (
       console.error(error)
       next(createHttpError(500, 'Internal Server Error'))
     }
+  }
+}
+export const updateSingleUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { body, params } = req
+    const { id } = params
+    const img = req.file?.path
+
+    if (img) {
+      await replaceImageUser(req.file, id, body)
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: id }, 
+      body, 
+      { new: true },
+    )
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json({
+      message: 'Update user successfully',
+      payload: updatedUser,
+    })
+  } catch (error) {
+    next(error)
   }
 }
